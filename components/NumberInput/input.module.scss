@@ -1,0 +1,26 @@
+.input_container{
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    font-size: 1.15rem;
+    color: #000;
+
+    input{
+        width: 100%;
+        font-size: 1.15rem;
+        background-color: #fff;
+        padding: 0.675em 1em;
+        border: 1px solid #caced1;
+        border-radius: 0.25rem;
+        outline: none;
+        box-shadow: -2px -1px 17px -7px rgba(156,154,154,0.6);
+    }
+    
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+    
+}
