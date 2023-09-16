@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { exchange } from '@/pages/api/currency';
 import CustomedSelect from '../CustomedSelect';
 import NumberInput from '../NumberInput';
@@ -10,30 +10,34 @@ import ICard from '@/Types/ICard';
 import { primaryColor } from '@/styles/colors';
 
 
-function Card(props:ICard) {
+const Card = ({ currancyList }:ICard) => {
   const [exhangeValue,setExchangeValue] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const {currancyList}= props;
-  const [quantity,setQuantity] =useState<number>(1.0);
+  const [timeOutId, setTimeOutId] = useState<any>(null);
+  const [quantity,setQuantity] = useState<number>(1.0);
   const [from,setFrom] =useState<string>('');
   const [to,setTo] =useState<string>('');
-
-  useEffect(()=>{
-    if(!Number.isNaN(quantity) && from && to){
+  
+  
+  const fetchData = useCallback(async () => {
+    if (quantity > 0 && from && to) {
       setIsLoading(true);
-      exchange({from: from, to: to, quantity: quantity})
-        .then((res:number) => {
-          setExchangeValue(res);
-          setIsLoading(false);
-        })
-        .catch(()=>{
-          setIsLoading(false);
-        });
+      try {
+        const res = await exchange({ from, to, quantity });
+        setExchangeValue(res);
+      } catch (error) {
+        console.error('Error exchanging currency:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  },[from, to])
+  }, [from, to]);
 
-      
-  const [timeOutId, setTimeOutId] = useState<any>(null);
+  useEffect(() => {
+    if (quantity > 0 && quantity.toString().length && from && to)
+      fetchData();
+  }, [fetchData, from, to]);
+
   const handleChangeQty = (e:any) => {
     setQuantity(e.target.value);
     clearTimeout(timeOutId);
@@ -67,7 +71,7 @@ function Card(props:ICard) {
       <div className={styles.inputs}>
         <div className={styles.formControl}>
           <p className={styles.label}>Amount</p>
-          <NumberInput value={quantity} placeholder={quantity ? quantity.toString() : "0.0"}  type='number' min={1} onChange={handleChangeQty}/>
+          <NumberInput  value={quantity} placeholder={quantity ? quantity.toString() : "0.0"} min={1} onChange={handleChangeQty}/>
         </div>
 
         <div className={styles.formControl}>
@@ -85,12 +89,12 @@ function Card(props:ICard) {
         </div>
       </div>
 
-      {(exhangeValue && to && from && !Number.isNaN(quantity))? <button className={styles.resetButton} onClick={()=>reset()}>Reset</button>:<></>}
-      {isLoading ? <PuffLoader color={primaryColor} className={styles.loader} />:<div>
-        {(exhangeValue && to && from && !Number.isNaN(quantity)) ? <p className={styles.result}>{`${quantity} ${from} Equals ${exhangeValue} ${to}`}</p>:<></>}
+      {(exhangeValue && to && from && quantity.toString().length && quantity > 0)? <button className={styles.resetButton} onClick={()=>reset()}>Reset</button>:<></>}
+      {isLoading && quantity.toString().length ? <PuffLoader color={primaryColor} className={styles.loader} />:<div>
+        {(exhangeValue && to && from && quantity.toString().length && quantity > 0) ? <p className={styles.result}>{`${quantity} ${from} Equals ${quantity * exhangeValue} ${to}`}</p>:<></>}
       </div>}
     </div>
   )
 }
 
-export default Card;
+export default React.memo(Card);

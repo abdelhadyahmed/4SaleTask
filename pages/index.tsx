@@ -3,11 +3,11 @@ import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.scss'
 import Card from '@/components/Card';
 import IHome from '@/Types/IHome';
+import { getAvailableCurrancy } from './api/currency';
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function Home(props:IHome) {
-  const {currancyList} = props;
+export default function Home({ currancyList }:IHome) {
   return (
     <>
       <Head>
@@ -27,19 +27,10 @@ export default function Home(props:IHome) {
 }
 
 export async function getServerSideProps() {
-  const url = 'https://currency-exchange.p.rapidapi.com/listquotes';
-  const options = {
-    method: 'GET',
-    headers: {
-      'X-RapidAPI-Key': 'b53f13bb43msh451041ebc7baab2p1cfb3ejsn338903d0faf6',
-      'X-RapidAPI-Host': 'currency-exchange.p.rapidapi.com'
-    }
-  };
   try {
-    const response = await fetch(url, options);
-    const result = await response.json();
-    return { props: { currancyList:result } }
+    const currancyList = await getAvailableCurrancy();
+    return { props: { currancyList } }
   } catch (error) {
-    console.error(error);
+    return { props: { currancyList: [] } };
   }
 }

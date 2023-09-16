@@ -1,15 +1,15 @@
 import React from 'react'
 import styles from './input.module.scss';
-import INumberInput from '@/Types/INumberInput';
+import INumberInput from '../../Types/INumberInput';
 
 const  NumberInput = (props:INumberInput) => {
-  const {value, type, placeholder, min, max, step, onChange} = props;
+  const {value, placeholder, min, max, step, onChange} = props;
   
   return (
     <div className={styles.input_container}>
       <input
         value={value}
-        type={type}
+        type="number"
         placeholder={placeholder}
         min={min}
         max={max}
@@ -20,4 +20,4 @@ const  NumberInput = (props:INumberInput) => {
   )
 }
 
-export default NumberInput;
+export default React.memo(NumberInput);

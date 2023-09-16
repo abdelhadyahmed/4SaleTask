@@ -55,4 +55,4 @@ const CustomedSelect = (props:ICustomedSelect) => {
     )
 }
 
-export default CustomedSelect;
+export default React.memo(CustomedSelect);
